@@ -1,0 +1,82 @@
+train:
+  data:
+    train_data:
+      supervision_mode: node
+      augmentation_mode: node
+    val_data:
+      supervision_mode: node
+      downsample: 16
+      eval_segmentation: True
+  model:
+    gnn_config:
+      layer_type: gin_layer
+      num_layers: 6
+      input_dim: 1280
+      hidden_dim: 32
+      output_dim: 32
+      readout_op: concat
+      readout_type: mean
+      act: PReLU
+      agg_type: mean
+      batch_norm: False,
+      graph_norm: False,
+      with_lrp: False
+      dropout: 0.5
+    node_classifier_config:
+      n_layers: 2
+      hidden_dim: 32
+      activation: PReLU
+      input_dropout: 0.5
+      seperate_heads: True
+  metrics:
+    node:
+      - NodeClassificationF1Score
+    segmentation:
+      - GleasonScoreF1
+      - DatasetDice
+
+  params:
+    fold: 1
+    partial: 100
+    centroid_features_mode: "no"
+
+    focused_metric: NodeClassificationF1Score
+    loss:
+      node:
+        class: NodeStochasticCrossEntropy
+        params:
+          background_label: 4
+          drop_probability: 0.0
+          nodes_to_keep: 200
+      params:
+          use_weighted_loss: True
+          use_log_frequency_weights: True
+    optimizer:
+      class: Adam
+      params:
+        lr: 0.00003
+      scheduler:
+        class: ReduceLROnPlateau
+        params:
+          mode: max
+          factor: 0.5
+          patience: 10
+          min_lr: 0.0000001
+
+    num_epochs: 2
+    batch_size: 4
+    num_workers: 8
+    clip_gradient_norm: null
+    validation_frequency: 1
+    balanced_sampling: True
+
+test:
+  data:
+    test_data:
+      supervision_mode: node
+      centroid_features_mode: "no"
+      eval_segmentation: True
+  model:
+    architecture: {}
+  params:
+    use_grad_cam: False

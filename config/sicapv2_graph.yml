@@ -1,0 +1,67 @@
+train:
+  data:
+    train_data:
+      supervision_mode: graph
+      augmentation_mode: node
+    val_data:
+      supervision_mode: graph
+  model:
+    gnn_config:
+      layer_type: gin_layer
+      num_layers: 12
+      input_dim: 1282
+      hidden_dim: 32
+      output_dim: 32
+      readout_op: concat
+      readout_type: mean
+      act: PReLU
+      agg_type: mean
+      batch_norm: False,
+      graph_norm: False,
+      with_lrp: False
+      dropout: 0.5
+    graph_classifier_config:
+      n_layers: 2
+      hidden_dim: 32
+      input_dropout: 0.0
+  metrics:
+    graph:
+      - MultiLabelF1Score
+
+  params:
+    fold: 1
+    partial: 100
+    centroid_features_mode: cat
+
+    focused_metric: MultiLabelF1Score
+    loss:
+      graph:
+        class: MultiLabelBCELoss
+        params: {}
+      params:
+          use_weighted_loss: False
+          use_log_frequency_weights: True
+    optimizer:
+      class: Adam
+      params:
+        lr: 0.0001
+      scheduler:
+        class: ExponentialLR
+        params:
+          gamma: 0.997
+
+    num_epochs: 5
+    batch_size: 4
+    num_workers: 8
+    clip_gradient_norm: null
+    validation_frequency: 1
+    balanced_sampling: False
+
+test:
+  data:
+    test_data:
+      supervision_mode: node
+      centroid_features_mode: cat
+      eval_segmentation: True
+  params:
+    use_grad_cam: True
