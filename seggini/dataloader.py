@@ -377,7 +377,7 @@ class AugmentedGraphDataset(GraphDataset):
             None,
             "node",
             "graph",
-        ], f"centroid_features must be in [no, cat, only] but is {augmentation_mode}"
+        ], f"augmentation_mode must be in [None, node, graph] but is {augmentation_mode}"
         assert centroid_features_mode in [
             "no",
             "cat",

@@ -3,6 +3,7 @@ train:
     train_data:
       supervision_mode: node
       augmentation_mode: node
+      eval_segmentation: False
     val_data:
       supervision_mode: node
       downsample: 16
@@ -63,11 +64,11 @@ train:
           patience: 10
           min_lr: 0.0000001
 
-    num_epochs: 2
+    num_epochs: 2000
     batch_size: 4
     num_workers: 8
     clip_gradient_norm: null
-    validation_frequency: 1
+    validation_frequency: 5
     balanced_sampling: True
 
 test:

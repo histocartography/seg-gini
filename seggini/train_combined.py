@@ -153,7 +153,7 @@ def train_classifier(
         discard_threshold=DISCARD_THRESHOLD,
         threshold=THRESHOLD,
         wsi_fix=WSI_FIX,
-        eval_segmentation=data_config["val_data"]["eval_segmentation"]
+        eval_segmentation=False
     )
     val_node_metric_logger = LoggingHelper(
         name="node",
@@ -168,6 +168,7 @@ def train_classifier(
     )
     val_combined_metric_logger = BaseLogger(
         metrics_config={},
+        focused_metric=params["focused_metric"],
         background_label=BACKGROUND_CLASS,
         nr_classes=NR_CLASSES,
         discard_threshold=DISCARD_THRESHOLD,
@@ -225,7 +226,7 @@ def train_classifier(
 
         # Validate model
         val_metrics = None
-        if epoch > 0 and epoch % params['validation_frequency'] == 0:
+        if epoch % params['validation_frequency'] == 0:
             model.eval()
             for graph_batch in val_dataloader:
                 with torch.no_grad():
@@ -314,10 +315,13 @@ def train_classifier(
 
     if val_graph_metric_logger.best_model is not None:
         return val_graph_metric_logger.best_model
-    if val_node_metric_logger.best_model is not None:
+    elif val_node_metric_logger.best_model is not None:
         return val_node_metric_logger.best_model
-    if val_combined_metric_logger.best_model is not None:
+    elif val_combined_metric_logger.best_model is not None:
         return val_combined_metric_logger.best_model
+    else:
+        print('ERROR! best model is None')
+        exit()
 
 
 if __name__ == "__main__":

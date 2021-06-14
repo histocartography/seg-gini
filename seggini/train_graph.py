@@ -18,7 +18,6 @@ def train_classifier(
         params: Dict,
         **kwargs,
 ) -> nn.Module:
-
     # Data sets
     train_dataset: GraphDataset
     val_dataset: GraphDataset
@@ -116,7 +115,7 @@ def train_classifier(
 
         # Validate model
         val_metrics = None
-        if epoch > 0 and epoch % params['validation_frequency'] == 0:
+        if epoch % params['validation_frequency'] == 0:
             model.eval()
             for graph_batch in val_dataloader:
                 with torch.no_grad():

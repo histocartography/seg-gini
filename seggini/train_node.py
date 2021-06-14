@@ -9,6 +9,7 @@ from models import *
 from losses import *
 from logger import *
 from test_gnn import *
+import copy
 
 def train_classifier(
         data_config: Dict,
@@ -91,13 +92,13 @@ def train_classifier(
             optim.zero_grad()
 
             graph = graph_batch.meta_graph.to(device)
-            labels = graph_batch.node_labels.to(device)
+            targets = graph_batch.node_labels.to(device)
             logits = model(graph)
 
             # Calculate loss
             loss_information = {
                 "logits": logits,
-                "targets": labels,
+                "targets": targets,
                 "node_associations": graph.batch_num_nodes,
             }
             loss = train_criterion(**loss_information)
@@ -121,18 +122,18 @@ def train_classifier(
 
         # Validate model
         val_metrics = None
-        if epoch > 0 and epoch % params['validation_frequency'] == 0:
+        if epoch % params['validation_frequency'] == 0:
             model.eval()
             for graph_batch in val_dataloader:
                 with torch.no_grad():
                     graph = graph_batch.meta_graph.to(device)
-                    labels = graph_batch.node_labels.to(device)
+                    targets = graph_batch.node_labels.to(device)
                     logits = model(graph)
 
                     # Calculate loss
                     loss_information = {
                         "logits": logits,
-                        "targets": labels,
+                        "targets": targets,
                         "node_associations": graph.batch_num_nodes,
                     }
                     loss = val_criterion(**loss_information)

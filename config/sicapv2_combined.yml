@@ -38,6 +38,9 @@ train:
       - MultiLabelF1Score
     node:
       - NodeClassificationF1Score
+    segmentation:
+      - GleasonScoreF1
+      - DatasetDice
 
   params:
     fold: 1
@@ -65,12 +68,11 @@ train:
         lr: 0.0001
       scheduler: null
 
-    num_epochs: 5
+    num_epochs: 2000
     batch_size: 4
     num_workers: 8
     clip_gradient_norm: null
-    focused_metric: MeanDatasetDice
-    validation_frequency: 1
+    validation_frequency: 5
     balanced_sampling: False
 
 test:

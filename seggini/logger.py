@@ -4,7 +4,7 @@ from utils import *
 
 class BaseLogger:
     def __init__(
-        self, metrics_config, focused_metric="", variable_size=False, **kwargs
+        self, metrics_config, focused_metric=None, variable_size=False, **kwargs
     ) -> None:
         self.metrics_config = metrics_config
         self.focused_metric = focused_metric
@@ -97,7 +97,7 @@ class BaseLogger:
             for i, (name, metric, best_metric_value, current_metric_value) in enumerate(all_information):
                 if metric.is_better(current_metric_value, best_metric_value):
                     self.best_metric_values[i] = current_metric_value
-                    
+
                     if name == self.focused_metric and metric.logs_model and model is not None:
                         self.best_model = model
 

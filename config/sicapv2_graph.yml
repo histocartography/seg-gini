@@ -3,8 +3,10 @@ train:
     train_data:
       supervision_mode: graph
       augmentation_mode: node
+      eval_segmentation: False
     val_data:
       supervision_mode: graph
+      eval_segmentation: False
   model:
     gnn_config:
       layer_type: gin_layer
@@ -50,11 +52,11 @@ train:
         params:
           gamma: 0.997
 
-    num_epochs: 5
+    num_epochs: 2000
     batch_size: 4
     num_workers: 8
     clip_gradient_norm: null
-    validation_frequency: 1
+    validation_frequency: 5
     balanced_sampling: False
 
 test:
