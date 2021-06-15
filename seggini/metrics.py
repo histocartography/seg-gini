@@ -6,7 +6,7 @@ from typing import List
 import numpy as np
 import sklearn.metrics
 import torch
-from utils import *
+from seggini.utils import *
 
 
 class Metric:

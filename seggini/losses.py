@@ -1,7 +1,7 @@
 from typing import List
 import torch
 from torch import nn
-from utils import *
+from seggini.utils import *
 
 class MultiLabelBCELoss(nn.Module):
     """Binary Cross Entropy loss over each label seperately, then averaged"""

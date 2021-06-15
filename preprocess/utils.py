@@ -5,9 +5,14 @@ from constants import *
 from PIL import Image
 Image.MAX_IMAGE_PIXELS = 100000000000
 
-def create_data_pickle(dir_name, columns, save_path):
+def create_data_pickle(
+        dir_name: Path,
+        columns: list(),
+        save_path: Path,
+        constants: Constants
+):
     df = pd.DataFrame(columns=columns)
-    for i, row in IMAGE_LABELS.iterrows():
+    for i, row in constants.IMAGE_LABELS.iterrows():
         name = row[0]
         path = dir_name / (name +'.png')
 
@@ -18,10 +23,15 @@ def create_data_pickle(dir_name, columns, save_path):
     df.set_index('name', inplace=True)
     df.to_pickle(save_path)
 
-def create_annotation_pickle(dir_name, columns, save_path):
+def create_annotation_pickle(
+        dir_name: Path,
+        columns: list(),
+        save_path: Path,
+        constants: Constants
+):
     df = pd.DataFrame(columns=columns)
 
-    for i, row in IMAGE_LABELS.iterrows():
+    for i, row in constants.IMAGE_LABELS.iterrows():
         name = row[0]
         path = dir_name / (name +'.png')
 
@@ -39,37 +49,46 @@ def create_annotation_pickle(dir_name, columns, save_path):
     df.set_index('name', inplace=True)
     df.to_pickle(save_path)
 
-def create_pickle():
+def create_pickle(constants: Constants):
     # Create images pickle
     create_data_pickle(
-        dir_name=IMAGES_PATH,
+        dir_name=constants.IMAGES_PATH,
         columns=['name', 'image_path'],
-        save_path=BASE_PATH / Path('images.pickle')
+        save_path=constants.BASE_PATH / Path('images.pickle'),
+        constants=constants
     )
     
     # Create annotation masks pickle
     for partial in PARTIAL:
         create_data_pickle(
-            dir_name=ANNOTATIONS_PATH/ Path('annotation_masks_' + str(partial)),
+            dir_name=constants.ANNOTATIONS_PATH/ Path('annotation_masks_' + str(partial)),
             columns=['name', 'annotation_mask_path'],
-            save_path=ANNOTATIONS_PATH / Path('annotation_masks_' + str(partial) + '.pickle')
+            save_path=constants.ANNOTATIONS_PATH / Path('annotation_masks_' + str(partial) + '.pickle'),
+            constants = constants
         )
 
     # Create labels pickle
     create_annotation_pickle(
-        dir_name=IMAGES_PATH,
+        dir_name=constants.IMAGES_PATH,
         columns=['name', 'data_provider', 'benign', 'grade3', 'grade4', 'grade5'],
-        save_path=BASE_PATH / Path('image_level_annotations.pickle')
+        save_path=constants.BASE_PATH / Path('image_level_annotations.pickle'),
+        constants=constants
     )
 
-def save_tissue_mask(mask, path):
+def save_tissue_mask(
+        mask: np.ndarray,
+        path: Path
+):
     color_palette = [255, 255, 255,     # non-tissue is white
                      0, 100, 0]         # tissue is green
     mask = Image.fromarray(mask.astype('uint8'), 'P')
     mask.putpalette(color_palette)
     mask.save(path)
 
-def save_superpixel_map(maps, path):
+def save_superpixel_map(
+        maps: np.ndarray,
+        path: Path
+):
     output_key = "default_key"
 
     with h5py.File(path, "w") as f:

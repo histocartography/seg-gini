@@ -1,3 +1,4 @@
+import argparse
 import glob
 from tqdm import tqdm
 from dgl.data.utils import save_graphs
@@ -14,15 +15,15 @@ from histocartography.preprocessing import (
     RAGGraphBuilder                      # graph builder,
 )
 
-def preprocessing():
-    # get image path
+def preprocessing(constants: Constants):
+    # get image paths
     image_fnames = glob.glob(os.path.join(
-        IMAGES_PATH,
+        constants.IMAGES_PATH,
         '*.png'))
     image_fnames.sort()
 
     # 1. define stain normalizer
-    normalizer = MacenkoStainNormalizer(target_path=STAIN_NORM_TARGET_IMAGE)
+    normalizer = MacenkoStainNormalizer(target_path=constants.STAIN_NORM_TARGET_IMAGE)
 
     # 2. define tissue detection
     tissue_detector = GaussianTissueMask(downsampling_factor=2)
@@ -81,7 +82,7 @@ def preprocessing():
         # c. extract tissue mask
         try:
             tissue_mask = tissue_detector.process(normalized_image)
-            save_tissue_mask(tissue_mask, TISSUE_MASKS_PATH / (image_name + '.png'))
+            save_tissue_mask(tissue_mask, constants.TISSUE_MASKS_PATH / (image_name + '.png'))
         except:
             print('Warning: {} failed during tissue mask detection.'.format(image_path))
             image_ids_failing.append(image_path)
@@ -90,7 +91,7 @@ def preprocessing():
         # d. extract superpixels
         try:
             superpixels, _ = spx_extractor.process(normalized_image, tissue_mask)
-            save_superpixel_map(superpixels, SUPERPIXELS_PATH / (image_name + '.h5'))
+            save_superpixel_map(superpixels, constants.SUPERPIXELS_PATH / (image_name + '.h5'))
         except:
             print('Warning: {} failed during superpixel extraction.'.format(image_path))
             image_ids_failing.append(image_path)
@@ -104,12 +105,9 @@ def preprocessing():
             image_ids_failing.append(image_path)
             pass
 
-        print('HERE')
-        exit()
-
         # f. load annotation masks
         for partial in PARTIAL:
-            annotation_path = ANNOTATIONS_PATH / \
+            annotation_path = constants.ANNOTATIONS_PATH / \
                               ('annotation_masks_' + str(partial)) / \
                               (image_name + '.png')
             annotation_mask = np.array(Image.open(annotation_path))
@@ -133,10 +131,18 @@ def preprocessing():
 
             # i. save
             save_graphs(
-                filename=str(GRAPHS_PATH/ ('partial_' + str(partial)) / (image_name + '.bin')),
+                filename=str(constants.GRAPHS_PATH/ ('partial_' + str(partial)) / (image_name + '.bin')),
                 g_list=[graph]
             )
 
 if __name__ == "__main__":
-    create_pickle()
-    preprocessing()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--base_path",
+                        type=str,
+                        required=True)
+    args = parser.parse_args()
+
+    constants = Constants(base_path=Path(args.base_path))
+
+    create_pickle(constants)
+    preprocessing(constants)

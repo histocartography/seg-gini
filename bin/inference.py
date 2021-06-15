@@ -8,18 +8,15 @@ from typing import Callable
 from functools import partial
 
 from histocartography.interpretability import GraphGradCAMExplainer
-
-from utils import *
-from logger import BaseLogger
-from metrics import (
-    F1Score
-)
-from models import (
+from seggini.utils import *
+from seggini.logger import BaseLogger
+from seggini.metrics import F1Score
+from seggini.models import (
     GraphClassifier,
     NodeClassifier,
     CombinedClassifier
 )
-from dataloader import (
+from seggini.dataloader import (
     GraphDataset,
     GraphDatapoint,
     collate_graphs

@@ -10,8 +10,8 @@ import torch
 from dgl.data.utils import load_graphs
 from torch.utils.data import Dataset, DataLoader
 from tqdm.auto import tqdm
-from metrics import inverse_frequency, inverse_log_frequency
-from utils import *
+from seggini.metrics import inverse_frequency, inverse_log_frequency
+from seggini.utils import *
 
 class BaseDataset(Dataset):
     def __init__(
@@ -562,6 +562,7 @@ def collate_graphs(samples: List[GraphDatapoint]) -> GraphBatch:
     )
 
 def prepare_graph_dataset(
+    base_path: Path,
     mode: str,
     fold: Optional[int] = -1,
     partial: Optional[int] = 100,
@@ -575,7 +576,7 @@ def prepare_graph_dataset(
 ) -> Dataset:
 
     # Get paths and global variables
-    constants = Constants(mode=mode, fold=fold, partial=partial)
+    constants = Constants(base_path=base_path, mode=mode, fold=fold, partial=partial)
 
     # Load all sample info
     all_metadata, label_mapper = get_metadata(constants)

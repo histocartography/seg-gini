@@ -1,14 +1,13 @@
 import time
-import torch
 from tqdm.auto import trange
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.utils.data.sampler import WeightedRandomSampler
 
-from dataloader import *
-from models import *
-from losses import *
-from logger import *
-from test_gnn import *
+from seggini.dataloader import *
+from seggini.models import *
+from seggini.losses import *
+from seggini.logger import *
+from inference import *
 import copy
 
 class CombinedCriterion(torch.nn.Module):
@@ -56,6 +55,7 @@ class CombinedCriterion(torch.nn.Module):
 
 
 def train_classifier(
+        base_path: Path,
         data_config: Dict,
         model_config: Dict,
         metrics_config: Dict,
@@ -66,8 +66,8 @@ def train_classifier(
     # Data sets
     train_dataset: GraphDataset
     val_dataset: GraphDataset
-    train_dataset = prepare_graph_dataset(mode="train", **data_config["train_data"], **params)
-    val_dataset = prepare_graph_dataset(mode="val", **data_config["val_data"], **params)
+    train_dataset = prepare_graph_dataset(base_path=base_path, mode="train", **data_config["train_data"], **params)
+    val_dataset = prepare_graph_dataset(base_path=base_path, mode="val", **data_config["val_data"], **params)
 
     if params['balanced_sampling']:
         training_sample_weights = train_dataset.get_graph_size_weights()
@@ -325,10 +325,11 @@ def train_classifier(
 
 
 if __name__ == "__main__":
-    config, config_path = get_config()
+    base_path, config = get_config()
 
     # Train classifier
     model = train_classifier(
+        base_path=base_path,
         data_config=config["train"]["data"],
         model_config=config["train"]["model"],
         metrics_config=config["train"]["metrics"],
@@ -336,7 +337,7 @@ if __name__ == "__main__":
     )
 
     # Save model
-    model_save_path = BASE_PATH / 'models'
+    model_save_path = base_path / 'models'
     create_directory(model_save_path)
     model_save_path = model_save_path / \
                       ('graph' +
@@ -346,7 +347,7 @@ if __name__ == "__main__":
     torch.save(model, model_save_path / "best_model.pt")
 
     # Test classifier
-    prediction_save_path = BASE_PATH / 'predictions'
+    prediction_save_path = base_path / 'predictions'
     create_directory(prediction_save_path)
     prediction_save_path = prediction_save_path / \
                            ('graph' +
@@ -355,7 +356,7 @@ if __name__ == "__main__":
     create_directory(prediction_save_path)
 
     # Test data set
-    test_dataset = prepare_graph_dataset(mode="test", **config["test"]["data"]["test_data"])
+    test_dataset = prepare_graph_dataset(base_path=base_path, mode="test", **config["test"]["data"]["test_data"])
 
     # segmentation, area based gleason grading
     test_classifier(

@@ -1,28 +1,31 @@
 import time
-import torch
 from tqdm.auto import trange
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.utils.data.sampler import WeightedRandomSampler
 
-from dataloader import *
-from models import *
-from losses import *
-from logger import *
-from test_gnn import *
+from seggini.dataloader import *
+from seggini.models import *
+from seggini.losses import *
+from seggini.logger import *
+from inference import *
 
 
 def train_classifier(
+        base_path: Path,
         data_config: Dict,
         model_config: Dict,
         metrics_config: Dict,
         params: Dict,
         **kwargs,
 ) -> nn.Module:
+    """Train the classification model for a given number of epochs.
+    """
+
     # Data sets
     train_dataset: GraphDataset
     val_dataset: GraphDataset
-    train_dataset = prepare_graph_dataset(mode="train", **data_config["train_data"], **params)
-    val_dataset = prepare_graph_dataset(mode="val", **data_config["val_data"], **params)
+    train_dataset = prepare_graph_dataset(base_path=base_path, mode="train", **data_config["train_data"], **params)
+    val_dataset = prepare_graph_dataset(base_path=base_path, mode="val", **data_config["val_data"], **params)
 
     if params['balanced_sampling']:
         training_sample_weights = train_dataset.get_graph_size_weights()
@@ -46,26 +49,29 @@ def train_classifier(
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     # Model
-    model = GraphClassifier(nr_classes=NR_CLASSES, **model_config)
+    model = NodeClassifier(nr_classes=NR_CLASSES, **model_config)
     model = model.to(device)
 
     # Loss functions
-    train_criterion = get_loss_criterion(params["loss"], train_dataset, supervision_mode="graph", name="graph", device=device)
-    val_criterion = get_loss_criterion(params["loss"], val_dataset, supervision_mode="graph", name="graph", device=device)
+    train_criterion = get_loss_criterion(params["loss"], train_dataset, supervision_mode="node", name="node", device=device)
+    val_criterion = get_loss_criterion(params["loss"], val_dataset, supervision_mode="node", name="node", device=device)
 
     # Optimizer
     optim, scheduler = get_optimizer(params["optimizer"], model)
 
     # Metrics
     train_metric_logger = LoggingHelper(
-        name="graph",
+        name="node",
         metrics_config=metrics_config,
         background_label=BACKGROUND_CLASS,
         nr_classes=NR_CLASSES,
-        eval_segmentation=False
+        discard_threshold=DISCARD_THRESHOLD,
+        threshold=THRESHOLD,
+        wsi_fix=WSI_FIX,
+        eval_segmentation=data_config["train_data"]["eval_segmentation"]
     )
     val_metric_logger = LoggingHelper(
-        name="graph",
+        name="node",
         metrics_config=metrics_config,
         focused_metric=params["focused_metric"],
         background_label=BACKGROUND_CLASS,
@@ -73,7 +79,7 @@ def train_classifier(
         discard_threshold=DISCARD_THRESHOLD,
         threshold=THRESHOLD,
         wsi_fix=WSI_FIX,
-        eval_segmentation=False
+        eval_segmentation=data_config["val_data"]["eval_segmentation"]
     )
 
     # Training loop
@@ -86,13 +92,14 @@ def train_classifier(
             optim.zero_grad()
 
             graph = graph_batch.meta_graph.to(device)
-            labels = graph_batch.graph_labels.to(device)
+            targets = graph_batch.node_labels.to(device)
             logits = model(graph)
 
             # Calculate loss
             loss_information = {
                 "logits": logits,
-                "targets": labels,
+                "targets": targets,
+                "node_associations": graph.batch_num_nodes,
             }
             loss = train_criterion(**loss_information)
             loss.backward()
@@ -120,18 +127,37 @@ def train_classifier(
             for graph_batch in val_dataloader:
                 with torch.no_grad():
                     graph = graph_batch.meta_graph.to(device)
-                    labels = graph_batch.graph_labels.to(device)
+                    targets = graph_batch.node_labels.to(device)
                     logits = model(graph)
 
                     # Calculate loss
                     loss_information = {
                         "logits": logits,
-                        "targets": labels,
+                        "targets": targets,
+                        "node_associations": graph.batch_num_nodes,
                     }
                     loss = val_criterion(**loss_information)
 
+                if data_config["val_data"]["eval_segmentation"]:
+                    segmentation_maps = get_batched_segmentation_maps(
+                        node_logits=loss_information["logits"],
+                        node_associations=graph.batch_num_nodes,
+                        superpixels=graph_batch.instance_maps,
+                        NR_CLASSES=NR_CLASSES,
+                    )
+                    segmentation_maps = torch.as_tensor(segmentation_maps)
+                    annotation = torch.as_tensor(graph_batch.segmentation_masks)
+                    tissue_masks = graph_batch.tissue_masks.astype(bool)
+                else:
+                    segmentation_maps = None
+                    annotation = None
+                    tissue_masks = None
+
                 val_metric_logger.add_iteration_outputs(
                     loss=loss.item(),
+                    annotation=annotation,
+                    predicted_segmentation=segmentation_maps,
+                    tissue_masks=tissue_masks,
                     image_labels=graph_batch.graph_labels,
                     **loss_information,
                 )
@@ -150,10 +176,11 @@ def train_classifier(
 
 
 if __name__ == "__main__":
-    config, config_path = get_config()
+    base_path, config = get_config()
 
     # Train classifier
     model = train_classifier(
+        base_path=base_path,
         data_config=config["train"]["data"],
         model_config=config["train"]["model"],
         metrics_config=config["train"]["metrics"],
@@ -161,7 +188,7 @@ if __name__ == "__main__":
     )
 
     # Save model
-    model_save_path = BASE_PATH / 'models'
+    model_save_path = base_path / 'models'
     create_directory(model_save_path)
     model_save_path = model_save_path / \
                       ('graph' +
@@ -171,16 +198,16 @@ if __name__ == "__main__":
     torch.save(model, model_save_path / "best_model.pt")
 
     # Test classifier
-    prediction_save_path = BASE_PATH / 'predictions'
+    prediction_save_path = base_path / 'predictions'
     create_directory(prediction_save_path)
     prediction_save_path = prediction_save_path / \
                            ('graph' +
-                           '_partial_' + str(config["train"]["params"]["partial"]) +
-                           '_fold_' + str(config["train"]["params"]["fold"]))
+                            '_partial_' + str(config["train"]["params"]["partial"]) +
+                            '_fold_' + str(config["train"]["params"]["fold"]))
     create_directory(prediction_save_path)
 
     # Test data set
-    test_dataset = prepare_graph_dataset(mode="test", **config["test"]["data"]["test_data"])
+    test_dataset = prepare_graph_dataset(base_path=base_path, mode="test", **config["test"]["data"]["test_data"])
 
     # segmentation, area based gleason grading
     test_classifier(
@@ -189,5 +216,3 @@ if __name__ == "__main__":
         prediction_save_path=prediction_save_path,
         **config["test"]["params"],
     )
-
-

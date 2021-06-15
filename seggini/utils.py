@@ -1,7 +1,6 @@
 import argparse
 import yaml
 import importlib
-from skimage.measure import regionprops
 from sklearn.metrics import confusion_matrix
 from typing import Optional, Any, Union
 import itertools
@@ -13,7 +12,7 @@ from matplotlib import pyplot as plt
 import os
 from PIL import Image
 Image.MAX_IMAGE_PIXELS = 100000000000
-from constants import *
+from seggini.constants import *
 
 
 def create_directory(path):
@@ -22,16 +21,21 @@ def create_directory(path):
 
 def get_config():
     parser = argparse.ArgumentParser()
+    parser.add_argument("--base_path",
+                        type=str,
+                        required=True)
     parser.add_argument("--config",
                         type=str,
-                        default='../config/sicapv2_graph.yml')
+                        required=True)
     args = parser.parse_args()
 
+    assert Path(args.base_path).exists() \
+        , f"Base path does not exist: {args.base_path}"
     assert Path(args.config).exists()\
         , f"Config path does not exist: {args.config}"
     with open(args.config) as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
-    return config, args.config
+    return Path(args.base_path), config
 
 def get_metadata(constants):
     preprocess_directory = constants.PREPROCESS_PATH
@@ -212,13 +216,6 @@ def get_segmentation_map(node_predictions, superpixels, NR_CLASSES):
         all_maps.append(map_l)
     return np.stack(all_maps).sum(axis=0)
 
-def extract_count(instance_map):
-    regions = regionprops(instance_map)
-    output = np.ones(instance_map.max(), dtype=np.int64) * -1
-    for region in regions:
-        output[region.label-1] = region.area
-    return output
-
 def save_confusion_matrix(prediction, ground_truth, classes, save_path):
     cm = confusion_matrix(
         y_true=ground_truth, y_pred=prediction, labels=np.arange(len(classes))
@@ -227,7 +224,7 @@ def save_confusion_matrix(prediction, ground_truth, classes, save_path):
     fig.savefig(str(save_path), dpi=300, bbox_inches="tight")
 
 def plot_confusion_matrix(
-    cm, classes, figname=None, normalize=False, title=None, cmap=plt.cm.Blues
+    cm, classes, normalize=False, title=None, cmap=plt.cm.Blues
 ):
     """
     This function prints and plots the confusion matrix.

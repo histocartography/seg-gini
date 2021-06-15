@@ -1,6 +1,6 @@
 from typing import DefaultDict
-from metrics import Metric
-from utils import *
+from seggini.metrics import Metric
+from seggini.utils import *
 
 class BaseLogger:
     def __init__(

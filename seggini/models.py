@@ -2,9 +2,8 @@ from typing import Dict, Tuple
 import dgl
 import torch
 from torch import nn
-
 from histocartography.ml.layers.multi_layer_gnn import MultiLayerGNN
-from utils import *
+from seggini.utils import *
 
 
 class ClassifierHead(nn.Module):

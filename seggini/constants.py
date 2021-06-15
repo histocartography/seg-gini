@@ -13,8 +13,6 @@ WSI_FIX = True
 THRESHOLD = 0.003
 DISCARD_THRESHOLD = 5000
 VALID_FOLDS = [-1, 1, 2, 3, 4]
-# BASE_PATH = Path('/Users/pus/Desktop/Projects/Data/Gleason/Release/SICAPv2')
-BASE_PATH = Path('/dataP/pus/wss/data/Release/SICAPv2')
 
 MASK_VALUE_TO_TEXT = {
     0: "Benign",
@@ -27,7 +25,8 @@ MASK_VALUE_TO_COLOR = {0: "green", 1: "blue", 2: "yellow", 3: "red", 4: "white"}
 
 
 class Constants:
-    def __init__(self, mode: str, fold: int, partial: int):
+    def __init__(self, base_path: Path, mode: str, fold: int, partial: int):
+        self.BASE_PATH = base_path
         self.MODE = mode
         self.FOLD = fold
         self.PARTIAL = partial
@@ -36,15 +35,15 @@ class Constants:
         self.set_constants()
 
     def set_constants(self):
-        self.PREPROCESS_PATH = BASE_PATH / 'preprocess'
-        self.IMAGES_DF = BASE_PATH / 'images.pickle'
-        self.ANNOTATIONS_DF = BASE_PATH / 'annotation_masks' / Path('annotation_masks_' + str(self.PARTIAL) + '.pickle')
-        self.LABELS_DF = BASE_PATH / 'image_level_annotations.pickle'
+        self.PREPROCESS_PATH = self.BASE_PATH / 'preprocess'
+        self.IMAGES_DF = self.BASE_PATH / 'images.pickle'
+        self.ANNOTATIONS_DF = self.BASE_PATH / 'annotation_masks' / Path('annotation_masks_' + str(self.PARTIAL) + '.pickle')
+        self.LABELS_DF = self.BASE_PATH / 'image_level_annotations.pickle'
 
         self.ID_PATHS = []
         if self.MODE == 'train':
-            self.ID_PATHS.append(BASE_PATH / 'partition' / 'Validation' / f"Val{self.FOLD}" / "Train.csv")
+            self.ID_PATHS.append(self.BASE_PATH / 'partition' / 'Validation' / f"Val{self.FOLD}" / "Train.csv")
         elif self.MODE == 'val':
-            self.ID_PATHS.append(BASE_PATH / 'partition' / 'Validation' / f"Val{self.FOLD}" / "Test.csv")
+            self.ID_PATHS.append(self.BASE_PATH / 'partition' / 'Validation' / f"Val{self.FOLD}" / "Test.csv")
         elif self.MODE == 'test':
-            self.ID_PATHS.append(BASE_PATH / 'partition' / 'Test' / "Test.csv")
+            self.ID_PATHS.append(self.BASE_PATH / 'partition' / 'Test' / "Test.csv")

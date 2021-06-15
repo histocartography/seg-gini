@@ -1,33 +1,35 @@
-'''This module handles all general constants of the experiment'''
 from pathlib import Path
 import pandas as pd
 
 NR_CLASSES = 4
 LABEL_TO_INDEX = {'0': 0, '3': 1, '4': 2, '5': 3}
-PARTIAL = [25, 100]
+PARTIAL = [10, 25, 50, 100]
 
-# BASE_PATH = Path('/Users/pus/Desktop/Projects/Data/Gleason/Release/SICAPv2')
-BASE_PATH = Path('/dataP/pus/wss/data/Release/SICAPv2')
+class Constants:
+    def __init__(self, base_path: Path):
+        self.BASE_PATH = base_path
+        self.set_constants()
 
-PREPROCESS_PATH = BASE_PATH / 'preprocess'
-IMAGES_PATH = BASE_PATH / 'images'
-ANNOTATIONS_PATH = BASE_PATH / 'annotation_masks'
+    def set_constants(self):
+        self.PREPROCESS_PATH = self.BASE_PATH / 'preprocess'
+        self.IMAGES_PATH = self.BASE_PATH / 'images'
+        self.ANNOTATIONS_PATH = self.BASE_PATH / 'annotation_masks'
 
-STAIN_NORM_TARGET_IMAGE = '../data/target.png'  # define stain normalization target image.
-IMAGE_LABELS = pd.read_csv(BASE_PATH / 'image_labels.csv')
+        self.STAIN_NORM_TARGET_IMAGE = '../data/target.png'  # define stain normalization target image.
+        self.IMAGE_LABELS = pd.read_csv(self.BASE_PATH / 'image_labels.csv')
 
-TISSUE_MASKS_PATH = PREPROCESS_PATH / 'tissue_masks'
-SUPERPIXELS_PATH = PREPROCESS_PATH / 'superpixels'
-GRAPHS_PATH = PREPROCESS_PATH / 'graphs'
+        self.TISSUE_MASKS_PATH = self.PREPROCESS_PATH / 'tissue_masks'
+        self.SUPERPIXELS_PATH = self.PREPROCESS_PATH / 'superpixels'
+        self.GRAPHS_PATH = self.PREPROCESS_PATH / 'graphs'
 
-if not PREPROCESS_PATH.exists():
-    PREPROCESS_PATH.mkdir()
-if not TISSUE_MASKS_PATH.exists():
-    TISSUE_MASKS_PATH.mkdir()
-if not SUPERPIXELS_PATH.exists():
-    SUPERPIXELS_PATH.mkdir()
-if not GRAPHS_PATH.exists():
-    GRAPHS_PATH.mkdir()
-for partial in PARTIAL:
-    if not (GRAPHS_PATH / ('partial_' + str(partial))).exists():
-        (GRAPHS_PATH / ('partial_' + str(partial))).mkdir()
+        if not self.PREPROCESS_PATH.exists():
+            self.PREPROCESS_PATH.mkdir()
+        if not self.TISSUE_MASKS_PATH.exists():
+            self.TISSUE_MASKS_PATH.mkdir()
+        if not self.SUPERPIXELS_PATH.exists():
+            self.SUPERPIXELS_PATH.mkdir()
+        if not self.GRAPHS_PATH.exists():
+            self.GRAPHS_PATH.mkdir()
+        for partial in PARTIAL:
+            if not (self.GRAPHS_PATH / ('partial_' + str(partial))).exists():
+                (self.GRAPHS_PATH / ('partial_' + str(partial))).mkdir()
