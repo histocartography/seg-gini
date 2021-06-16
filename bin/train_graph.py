@@ -1,13 +1,20 @@
+import os
+from typing import Dict
 import time
+from pathlib import Path
+import torch
+from torch import nn
 from tqdm.auto import trange
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.utils.data.sampler import WeightedRandomSampler
 
-from seggini.dataloader import *
-from seggini.models import *
-from seggini.losses import *
-from seggini.logger import *
-from inference import *
+from seggini.model import NR_CLASSES, BACKGROUND_CLASS, VARIABLE_SIZE, WSI_FIX, THRESHOLD, DISCARD_THRESHOLD
+from seggini.model import GraphDataset
+from seggini.model import prepare_graph_dataset, prepare_graph_dataloader, get_config
+from seggini.model import GraphClassifier
+from seggini.model import get_loss_criterion, get_optimizer
+from seggini.model import LoggingHelper
+from .inference import test_classifier
 
 
 def train_classifier(
@@ -162,23 +169,21 @@ if __name__ == "__main__":
     )
 
     # Save model
-    model_save_path = base_path / 'models'
-    create_directory(model_save_path)
-    model_save_path = model_save_path / \
+    model_save_path = base_path / \
+                      'models' / \
                       ('graph' +
                        '_partial_' + str(config["train"]["params"]["partial"]) +
                        '_fold_' + str(config["train"]["params"]["fold"]))
-    create_directory(model_save_path)
+    os.makedirs(str(model_save_path), exist_ok=True)
     torch.save(model, model_save_path / "best_model.pt")
 
     # Test classifier
-    prediction_save_path = base_path / 'predictions'
-    create_directory(prediction_save_path)
-    prediction_save_path = prediction_save_path / \
+    prediction_save_path = base_path / \
+                           'predictions' / \
                            ('graph' +
                            '_partial_' + str(config["train"]["params"]["partial"]) +
                            '_fold_' + str(config["train"]["params"]["fold"]))
-    create_directory(prediction_save_path)
+    os.makedirs(str(prediction_save_path), exist_ok=True)
 
     # Test data set
     test_dataset = prepare_graph_dataset(base_path=base_path, mode="test", **config["test"]["data"]["test_data"])

@@ -1,6 +1,9 @@
 from typing import DefaultDict
-from seggini.metrics import Metric
-from seggini.utils import *
+import torch
+import numpy as np
+
+from .metrics import Metric
+from .utils import dynamic_import_from
 
 class BaseLogger:
     def __init__(

@@ -1,18 +1,24 @@
+import os
 import argparse
 import glob
 from tqdm import tqdm
+from pathlib import Path
+import numpy as np
 from dgl.data.utils import save_graphs
 from PIL import Image
 Image.MAX_IMAGE_PIXELS = 100000000000
 
-from utils import *
+from seggini.preprocess import PARTIAL
+from seggini.preprocess import Constants
+from seggini.preprocess import create_pickle, save_tissue_mask, save_superpixel_map
+
 from histocartography.preprocessing import (
     MacenkoStainNormalizer,              # stain normalizer
     GaussianTissueMask,                  # tissue mask detector
     ColorMergedSuperpixelExtractor,      # superpixel extractor
     AugmentedDeepFeatureExtractor,       # feature extractor
     AnnotationPostProcessor,             # processing annotations
-    RAGGraphBuilder                      # graph builder,
+    RAGGraphBuilder                      # graph builder
 )
 
 def preprocessing(constants: Constants):
@@ -42,7 +48,7 @@ def preprocessing(constants: Constants):
     feature_extractor = AugmentedDeepFeatureExtractor(
         architecture='mobilenet_v2',
         num_workers=1,
-        rotations=[0, 90],
+        rotations=[0, 90, 180, 270],
         flips=['n', 'h'],
         patch_size=144,
         stride=144,

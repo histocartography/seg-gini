@@ -1,7 +1,7 @@
 from typing import List
 import torch
 from torch import nn
-from seggini.utils import *
+from .utils import dynamic_import_from
 
 class MultiLabelBCELoss(nn.Module):
     """Binary Cross Entropy loss over each label seperately, then averaged"""
@@ -68,6 +68,7 @@ class NodeStochasticCrossEntropy(nn.Module):
             logits = logits[to_keep_mask]
         targets = targets.to(torch.int64)
         return self.cross_entropy(logits, targets)
+
 
 def get_loss_criterion(loss, dataset, supervision_mode, name=None, device=None):
     if loss["params"]["use_weighted_loss"]:

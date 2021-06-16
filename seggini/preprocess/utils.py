@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import h5py
-from constants import *
+from .constants import *
 from PIL import Image
 Image.MAX_IMAGE_PIXELS = 100000000000
 

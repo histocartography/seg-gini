@@ -1,12 +1,12 @@
 from functools import partial
 import logging
 from abc import abstractmethod
-from typing import List
-
+from typing import List, Any, Union
 import numpy as np
 import sklearn.metrics
 import torch
-from seggini.utils import *
+
+from .utils import fast_histogram, fast_confusion_matrix
 
 
 class Metric:

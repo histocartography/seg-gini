@@ -3,7 +3,9 @@ import dgl
 import torch
 from torch import nn
 from histocartography.ml.layers.multi_layer_gnn import MultiLayerGNN
-from seggini.utils import *
+
+from .constants import NR_CLASSES, GNN_NODE_FEAT_IN, GNN_NODE_FEAT_OUT
+from .utils import dynamic_import_from
 
 
 class ClassifierHead(nn.Module):

@@ -1,26 +1,22 @@
-import matplotlib.pyplot as plt
+from typing import Callable, Optional, Any
+from pathlib import Path
 from abc import abstractmethod
 from torch.utils.data import Dataset, DataLoader
 from tqdm import tqdm
+import numpy as np
 import dgl
+import torch
 from torch import nn
-from typing import Callable
 from functools import partial
-
+from matplotlib import pyplot as plt
 from histocartography.interpretability import GraphGradCAMExplainer
-from seggini.utils import *
-from seggini.logger import BaseLogger
-from seggini.metrics import F1Score
-from seggini.models import (
-    GraphClassifier,
-    NodeClassifier,
-    CombinedClassifier
-)
-from seggini.dataloader import (
-    GraphDataset,
-    GraphDatapoint,
-    collate_graphs
-)
+
+from seggini.model import NR_CLASSES, BACKGROUND_CLASS, THRESHOLD, WSI_FIX, VARIABLE_SIZE, DISCARD_THRESHOLD
+from seggini.model import save_confusion_matrix, get_segmentation_map, show_class_activation, show_segmentation_masks
+from seggini.model import BaseLogger
+from seggini.model import F1Score
+from seggini.model import GraphClassifier, NodeClassifier, CombinedClassifier
+from seggini.model import GraphDataset, GraphDatapoint, collate_graphs
 
 
 class BaseInference:
@@ -175,7 +171,6 @@ class GraphNodeBasedInference(BaseInference):
 
 
 # Dataset Segmentation Inferencer
-
 class DatasetBaseInference:
     def __init__(
             self, inferer: BaseInference, callbacks: Optional[Callable] = []

@@ -1,5 +1,5 @@
 from dataclasses import asdict, dataclass
-from typing import Tuple, List, Callable
+from typing import Tuple, List, Callable, Optional, Any
 from collections import defaultdict
 import cv2
 import numpy as np
@@ -10,8 +10,12 @@ import torch
 from dgl.data.utils import load_graphs
 from torch.utils.data import Dataset, DataLoader
 from tqdm.auto import tqdm
-from seggini.metrics import inverse_frequency, inverse_log_frequency
-from seggini.utils import *
+from pathlib import Path
+
+from .metrics import inverse_frequency, inverse_log_frequency
+from .constants import NR_CLASSES, LABEL, CENTROID, FEATURES, GNN_NODE_FEAT_IN, GNN_NODE_FEAT_OUT
+from .constants import Constants
+from .utils import read_image, fast_histogram, get_metadata
 
 class BaseDataset(Dataset):
     def __init__(

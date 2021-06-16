@@ -11,13 +11,11 @@ import torch
 from matplotlib import pyplot as plt
 import os
 from PIL import Image
+from pathlib import Path
 Image.MAX_IMAGE_PIXELS = 100000000000
-from seggini.constants import *
 
+from .constants import MASK_VALUE_TO_TEXT, MASK_VALUE_TO_COLOR
 
-def create_directory(path):
-    if not os.path.isdir(path):
-        os.mkdir(path)
 
 def get_config():
     parser = argparse.ArgumentParser()
@@ -128,6 +126,10 @@ def to_mapper(df):
             [row["benign"], row["grade3"], row["grade4"], row["grade5"]]
         )
     return mapper
+
+def create_directory(path):
+    if not os.path.isdir(path):
+        os.mkdir(path)
 
 def dynamic_import_from(source_file: str, class_name: str) -> Any:
     """Do a from source_file import class_name dynamically
