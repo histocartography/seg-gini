@@ -3,7 +3,7 @@ import pandas as pd
 
 NR_CLASSES = 4
 LABEL_TO_INDEX = {'0': 0, '3': 1, '4': 2, '5': 3}
-PARTIAL = [10, 25, 50, 100]
+PARTIAL = [100]
 
 class Constants:
     def __init__(self, base_path: Path):

@@ -8,6 +8,8 @@ import glob
 import requests
 from tqdm.auto import tqdm
 from tqdm import tqdm
+from seggini.preprocess import Constants
+from pathlib import Path
 
 SICAPv2_ZIP_FNAME = 'sicap.zip'
 IMAGE_SIZE = 512
@@ -37,21 +39,6 @@ DUPLICATES = [
     '18B0005478J_Block_Region_13',
     '18B0005478J_Block_Region_10'
 ]
-
-
-def parse_arguments():
-    """
-    Argument parser.
-    """
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        '-o',
-        '--out_path',
-        type=str,
-        help='path to store SICAPv2 for WSIs.',
-        required=True
-    )
-    return parser.parse_args()
 
 
 def download_zip(url, out_path):
@@ -215,19 +202,26 @@ def regions_to_wsis(dataset_path):
 
 
 if __name__ == "__main__":
-    args = parse_arguments()
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--base_path',
+        type=str,
+        help='path to store SICAPv2 for WSIs.',
+        required=True
+    )
+    args = parser.parse_args()
 
     # 1. download SICAPv2 dataset
     download_zip(
         url='https://data.mendeley.com/public-files/datasets/9xxm58dvs3/files/6ab087a7-ca89-47ac-9698-f6546bb50f98/file_downloaded',
-        out_path=args.out_path
+        out_path=args.base_path
     )
 
     # 2. extract zip to destination
-    extract_zip(args.out_path)
+    extract_zip(args.base_path)
 
     # 3. stitch patches into regions
-    patches_to_regions(os.path.join(args.out_path, 'SICAPv2'))
+    patches_to_regions(args.base_path)
 
     # 4. stitch regions into WSIs
-    regions_to_wsis(os.path.join(args.out_path, 'SICAPv2'))
+    regions_to_wsis(args.base_path)

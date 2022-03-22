@@ -19,8 +19,8 @@ train:
       readout_type: mean
       act: PReLU
       agg_type: mean
-      batch_norm: False,
-      graph_norm: False,
+      batch_norm: True
+      graph_norm: True
       with_lrp: False
       dropout: 0.5
     graph_classifier_config:
