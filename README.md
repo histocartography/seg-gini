@@ -31,14 +31,15 @@ conda activate seggini
 
 [`SICAPv2`](https://data.mendeley.com/datasets/9xxm58dvs3/1) is a database of H&amp;&E stained patches (512x512 pixels) from 155 prostate whole-slide images (WSIs) across 95 patients. The dataset contains local patch-level segmentation masks for Gleason patterns (Non-cancerous, Grade3, Grade4, Grade5) and global Gleason scores (Primary + Secondary).  
 
-The SICAPv2 dataset downloading, the construction of WSIs, and the slide-level Gleason pattern segmentation masks can be created by running:
+The stitched WSIs and corresponding Gleason pattern segmentation masks can be **downloaded** from [`SICAPv2`](https://ibm.box.com/s/h165tu6gh96r6da4d8jrjd8xl01o0mfz).
+Alternatively, the WSIs and masks can be constructed, i.e., patch downloading and stitching, by running:
 
 ```
 cd bin
 python create_sicap_data.py --base_path <PATH-TO-STORE-DATASET>
 ```
 
-A sample WSI and corresponding segmentation mask is demonstrated as follows. To highlight, the available Gleason score is inexact as it only states the worst and the second worst Gleason pattern present in the WSI. 
+ A sample WSI and corresponding segmentation mask is demonstrated as follows. To highlight, the available Gleason score is inexact as it only states the worst and the second worst Gleason pattern present in the WSI. 
 
 ![Overview of the dataset.](figs/dataset.png)
   
