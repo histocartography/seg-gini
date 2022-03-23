@@ -50,11 +50,13 @@ def create_annotation_pickle(
     df.to_pickle(save_path)
 
 def create_pickle(constants: Constants):
+    os.makedirs(constants.PICKLE_PATH, exist_ok=True)
+
     # Create images pickle
     create_data_pickle(
         dir_name=constants.IMAGES_PATH,
         columns=['name', 'image_path'],
-        save_path=constants.BASE_PATH / Path('images.pickle'),
+        save_path=constants.PICKLE_PATH / Path('images.pickle'),
         constants=constants
     )
     
@@ -63,7 +65,7 @@ def create_pickle(constants: Constants):
         create_data_pickle(
             dir_name=constants.ANNOTATIONS_PATH/ Path('annotation_masks_' + str(partial)),
             columns=['name', 'annotation_mask_path'],
-            save_path=constants.ANNOTATIONS_PATH / Path('annotation_masks_' + str(partial) + '.pickle'),
+            save_path=constants.PICKLE_PATH / Path('annotation_masks_' + str(partial) + '.pickle'),
             constants = constants
         )
 
@@ -71,7 +73,7 @@ def create_pickle(constants: Constants):
     create_annotation_pickle(
         dir_name=constants.IMAGES_PATH,
         columns=['name', 'data_provider', 'benign', 'grade3', 'grade4', 'grade5'],
-        save_path=constants.BASE_PATH / Path('image_level_annotations.pickle'),
+        save_path=constants.PICKLE_PATH / Path('image_level_annotations.pickle'),
         constants=constants
     )
 

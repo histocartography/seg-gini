@@ -36,9 +36,9 @@ class Constants:
 
     def set_constants(self):
         self.PREPROCESS_PATH = self.BASE_PATH / 'preprocess'
-        self.IMAGES_DF = self.BASE_PATH / 'images.pickle'
-        self.ANNOTATIONS_DF = self.BASE_PATH / 'annotation_masks' / Path('annotation_masks_' + str(self.PARTIAL) + '.pickle')
-        self.LABELS_DF = self.BASE_PATH / 'image_level_annotations.pickle'
+        self.IMAGES_DF = self.BASE_PATH / 'pickles'/ 'images.pickle'
+        self.ANNOTATIONS_DF = self.BASE_PATH / 'pickles'/ Path('annotation_masks_' + str(self.PARTIAL) + '.pickle')
+        self.LABELS_DF = self.BASE_PATH / 'pickles'/ 'image_level_annotations.pickle'
 
         self.ID_PATHS = []
         if self.MODE == 'train':
