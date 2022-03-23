@@ -12,7 +12,7 @@ train:
     gnn_config:
       layer_type: gin_layer
       num_layers: 6
-      input_dim: 1280
+      input_dim: 1282
       hidden_dim: 32
       output_dim: 32
       readout_op: concat
@@ -39,7 +39,7 @@ train:
   params:
     fold: 1
     partial: 100
-    centroid_features_mode: "no"
+    centroid_features_mode: cat
 
     focused_metric: NodeClassificationF1Score
     loss:
@@ -75,7 +75,7 @@ test:
   data:
     test_data:
       supervision_mode: node
-      centroid_features_mode: "no"
+      centroid_features_mode: cat
       eval_segmentation: True
   model:
     architecture: {}

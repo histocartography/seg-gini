@@ -10,7 +10,7 @@ train:
   model:
     gnn_config:
       layer_type: gin_layer
-      num_layers: 12
+      num_layers: 6
       input_dim: 1282
       hidden_dim: 32
       output_dim: 32
