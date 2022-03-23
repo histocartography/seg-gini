@@ -7,6 +7,7 @@ The code is built on the [`Histocartography`](https://github.com/histocartograph
 
 The described experiments are presented for the [`SICAPv2`](https://data.mendeley.com/datasets/9xxm58dvs3/1) dataset, a cohort of Hematoxylin and Eosin (H&amp;E) stained prostate needle biopsies. 
 
+### Overview
 ![Overview of the proposed approach.](figs/overview.png)
 
 ## Installation 
@@ -16,7 +17,7 @@ The described experiments are presented for the [`SICAPv2`](https://data.mendele
 Clone the repo:
 
 ```
-git clone https://github.com/histocartography/seg-gini.git && cd seg-gini
+git clone git@github.com:histocartography/seg-gini.git && cd seg-gini
 ```
 
 Create a conda environment and activate it:
@@ -28,17 +29,18 @@ conda activate seggini
 
 ### Downloading and preparing the SICAPv2 dataset 
 
-SICAPv2 is a database containing Hematoxylin and Eosin (H&E) stained patches (512x512) from 155 prostate whole-slide images across 95 patients. The dataset contains local patch-level segmentation masks for Gleason patterns (Non cancerous, Grade3, Grade4, Grade5) and global Gleason scores (Primary + Secondary).  
+[`SICAPv2`](https://data.mendeley.com/datasets/9xxm58dvs3/1) is a database of H&amp;&E stained patches (512x512 pixels) from 155 prostate whole-slide images (WSIs) across 95 patients. The dataset contains local patch-level segmentation masks for Gleason patterns (Non-cancerous, Grade3, Grade4, Grade5) and global Gleason scores (Primary + Secondary).  
 
-The SICAPv2 dataset can be downloaded, and the whole-slide images and corresponding Gleason pattern segmentation masks can be recreated by running:
+The SICAPv2 dataset downloading, the construction of WSIs, and the slide-level Gleason pattern segmentation masks can be created by running:
 
 ```
 cd bin
 python create_sicap_data.py
 ```
 
+A sample WSI and corresponding segmentation mask is demonstrated as follows. To highlight, the available Gleason score is inexact as it only states the worst and the second worst Gleason pattern present in the WSI. 
 
-![Overview of the dataset.](figs/overview.png)
+![Overview of the dataset.](figs/dataset.png)
   
 
 ## Running the code 
