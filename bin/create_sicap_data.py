@@ -1,15 +1,12 @@
-from PIL import Image
-import numpy as np
 import zipfile
-import os
 import argparse
 import glob
+import shutil
 
 import requests
 from tqdm.auto import tqdm
 from tqdm import tqdm
-from seggini.preprocess import Constants
-from pathlib import Path
+from seggini.preprocess.utils import *
 
 SICAPv2_ZIP_FNAME = 'sicap.zip'
 IMAGE_SIZE = 512
@@ -131,7 +128,7 @@ def patches_to_regions(dataset_path):
     out_mask_path = os.path.join(dataset_path, MASK_REGIONS_DIR)
     os.makedirs(out_image_path, exist_ok=True)
     os.makedirs(out_mask_path, exist_ok=True)
-    image_fnames = glob.glob(os.path.join(dataset_path, 'images', '*.jpg'))
+    image_fnames = glob.glob(os.path.join(dataset_path, DATASET, 'images', '*.jpg'))
     slide_names = set([f.split('/')[-1].split('_')[0] for f in image_fnames])
 
     for slide_id in tqdm(slide_names):
@@ -198,7 +195,7 @@ def regions_to_wsis(dataset_path):
             mask_canvas = Image.open(region_mask_fnames[0])
 
         image_canvas.save(os.path.join(out_image_path, wsi_id + '.png'), subsampling=0)
-        mask_canvas.save(os.path.join(out_mask_path, wsi_id + '.png'), subsampling=0)
+        save_annotation_mask(mask_canvas, os.path.join(out_mask_path, wsi_id + '.png'))
 
 
 if __name__ == "__main__":
@@ -225,3 +222,9 @@ if __name__ == "__main__":
 
     # 4. stitch regions into WSIs
     regions_to_wsis(args.base_path)
+
+    # 5. delete unrequired files and folders
+    os.remove(os.path.join(args.base_path, SICAPv2_ZIP_FNAME))
+    shutil.rmtree(os.path.join(args.base_path, DATASET))
+    shutil.rmtree(os.path.join(args.base_path, IMAGE_REGIONS_DIR))
+    shutil.rmtree(os.path.join(args.base_path, MASK_REGIONS_DIR))

@@ -87,6 +87,15 @@ def save_tissue_mask(
     mask.putpalette(color_palette)
     mask.save(path)
 
+def save_annotation_mask(mask, save_path):
+    my_palette = [0, 100, 0,        # benign is green
+                  0, 0, 255,        # Gleason 3 is blue
+                  255, 255, 0,      # Gleason 4 is yellow
+                  255, 0, 0,        # Gleason 5 is red
+                  255, 255, 255]    # ignore class is white
+    mask.putpalette(my_palette)
+    mask.save(save_path)
+
 def save_superpixel_map(
         maps: np.ndarray,
         path: Path
