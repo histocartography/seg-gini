@@ -41,7 +41,7 @@ The stitched WSIs and corresponding Gleason pattern segmentation masks can be **
 Alternatively, the WSIs and masks can be constructed, i.e., patch downloading and stitching, by running:
 
 ```
-python bin\create_sicap_data.py --base_path <PATH-TO-STORE-DATASET>
+python bin/create_sicap_data.py --base_path <PATH-TO-STORE-DATASET>
 ```
 
  A sample WSI and corresponding segmentation mask is demonstrated as follows. To highlight, the available Gleason score is inexact as it only states the worst and the second worst Gleason pattern present in the WSI. 
