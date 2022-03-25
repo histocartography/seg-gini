@@ -20,7 +20,7 @@ class BaseLogger:
         self.metric_names = list()
         self.metrics = list()
         for metric in metrics_config:
-            metric_class = dynamic_import_from("metrics", metric)
+            metric_class = dynamic_import_from("seggini.model.metrics", metric)
             self.metrics.append(metric_class(**kwargs))
             self.metric_names.append(metric)
             self.best_metric_values.append(

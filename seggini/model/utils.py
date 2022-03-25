@@ -222,7 +222,7 @@ def save_confusion_matrix(prediction, ground_truth, classes, save_path):
     cm = confusion_matrix(
         y_true=ground_truth, y_pred=prediction, labels=np.arange(len(classes))
     )
-    fig = plot_confusion_matrix(cm, classes, figname=None, normalize=False)
+    fig = plot_confusion_matrix(cm, classes, title=None, normalize=False)
     fig.savefig(str(save_path), dpi=300, bbox_inches="tight")
 
 def plot_confusion_matrix(

@@ -81,7 +81,7 @@ def get_loss_criterion(loss, dataset, supervision_mode, name=None, device=None):
 def get_loss(config, name=None, device=None):
     if name is not None:
         config = config[name]
-    loss_class = dynamic_import_from("losses", config["class"])
+    loss_class = dynamic_import_from("seggini.model.losses", config["class"])
     criterion = loss_class(**config.get("params", {}))
     return criterion.to(device) if device is not None else criterion
 

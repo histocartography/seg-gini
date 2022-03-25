@@ -68,7 +68,6 @@ def stitch_image(fnames, slide_id, region_id):
                        the same region
         slide_id (str): name of the WSI
         region_id (str): name of the region within the WSI
-
     Returns:
         canvas (PIL.Image): stitched region
     """
@@ -141,6 +140,7 @@ def patches_to_regions(dataset_path):
                 mask.save(os.path.join(out_mask_path, slide_id + region_id + '.png'), subsampling=0)
 
 
+
 def extract_zip(out_path):
     """
     Unzip
@@ -192,7 +192,7 @@ def regions_to_wsis(dataset_path):
             mask_canvas = Image.fromarray(mask_canvas.astype(np.uint8))
         else:
             image_canvas = Image.open(region_image_fnames[0])
-            mask_canvas = Image.open(region_mask_fnames[0])
+            mask_canvas = Image.open(region_mask_fnames[0]).convert('P')
 
         image_canvas.save(os.path.join(out_image_path, wsi_id + '.png'), subsampling=0)
         save_annotation_mask(mask_canvas, os.path.join(out_mask_path, wsi_id + '.png'))
@@ -209,14 +209,17 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # 1. download SICAPv2 dataset
+
+    '''
     download_zip(
         url='https://data.mendeley.com/public-files/datasets/9xxm58dvs3/files/6ab087a7-ca89-47ac-9698-f6546bb50f98/file_downloaded',
         out_path=args.base_path
     )
+    
 
     # 2. extract zip to destination
     extract_zip(args.base_path)
-
+    '''
     # 3. stitch patches into regions
     patches_to_regions(args.base_path)
 

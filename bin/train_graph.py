@@ -14,7 +14,7 @@ from seggini.model import prepare_graph_dataset, prepare_graph_dataloader, get_c
 from seggini.model import GraphClassifier
 from seggini.model import get_loss_criterion, get_optimizer
 from seggini.model import LoggingHelper
-from .inference import test_classifier
+from bin.inference import test_classifier
 
 
 def train_classifier(
@@ -95,7 +95,6 @@ def train_classifier(
             graph = graph_batch.meta_graph.to(device)
             labels = graph_batch.graph_labels.to(device)
             logits = model(graph)
-
             # Calculate loss
             loss_information = {
                 "logits": logits,
@@ -178,6 +177,7 @@ if __name__ == "__main__":
     torch.save(model, model_save_path / "best_model.pt")
 
     # Test classifier
+    print('\nTESTING\n')
     prediction_save_path = base_path / \
                            'predictions' / \
                            ('graph' +
@@ -195,5 +195,7 @@ if __name__ == "__main__":
         prediction_save_path=prediction_save_path,
         **config["test"]["params"],
     )
+
+    print('\nDONE TESTING !!')
 
 

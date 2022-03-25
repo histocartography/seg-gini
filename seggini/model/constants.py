@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 
 LABEL = "label"
 CENTROID = "centroid"
@@ -42,8 +43,8 @@ class Constants:
 
         self.ID_PATHS = []
         if self.MODE == 'train':
-            self.ID_PATHS.append(self.BASE_PATH / 'partition' / 'Validation' / f"Val{self.FOLD}" / "Train.csv")
+            self.ID_PATHS.append(os.path.join('partition' , 'Train' , f"Val{self.FOLD}" , "Train.csv"))
         elif self.MODE == 'val':
-            self.ID_PATHS.append(self.BASE_PATH / 'partition' / 'Validation' / f"Val{self.FOLD}" / "Test.csv")
+            self.ID_PATHS.append(os.path.join('partition' , 'Train' , f"Val{self.FOLD}" , "Val.csv"))
         elif self.MODE == 'test':
-            self.ID_PATHS.append(self.BASE_PATH / 'partition' / 'Test' / "Test.csv")
+            self.ID_PATHS.append(os.path.join('partition' , 'Test' , "Test.csv"))

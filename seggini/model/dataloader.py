@@ -17,6 +17,9 @@ from .constants import NR_CLASSES, LABEL, CENTROID, FEATURES, GNN_NODE_FEAT_IN, 
 from .constants import Constants
 from .utils import read_image, fast_histogram, get_metadata
 
+import warnings
+warnings.filterwarnings("ignore", category=np.VisibleDeprecationWarning)
+
 class BaseDataset(Dataset):
     def __init__(
         self,
