@@ -209,17 +209,14 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # 1. download SICAPv2 dataset
-
-    '''
     download_zip(
         url='https://data.mendeley.com/public-files/datasets/9xxm58dvs3/files/6ab087a7-ca89-47ac-9698-f6546bb50f98/file_downloaded',
         out_path=args.base_path
     )
     
-
     # 2. extract zip to destination
     extract_zip(args.base_path)
-    '''
+   
     # 3. stitch patches into regions
     patches_to_regions(args.base_path)
 

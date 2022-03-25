@@ -27,6 +27,12 @@ conda env create -f environment.yml
 conda activate seggini
 ```
 
+Install PyTorch: 
+
+```
+pip install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html
+```
+
 ### Downloading and preparing the SICAPv2 dataset 
 
 [`SICAPv2`](https://data.mendeley.com/datasets/9xxm58dvs3/1) is a database of H&amp;&E stained patches (512x512 pixels) from 155 prostate whole-slide images (WSIs) across 95 patients. The dataset contains local patch-level segmentation masks for Gleason patterns (Non-cancerous, Grade3, Grade4, Grade5) and global Gleason scores (Primary + Secondary).  
@@ -77,13 +83,14 @@ SICAPv2-data
 |   |__ tissue_masks 
 |
 |__ pickles
-    |
-    |_ images.pickle
-    |
-    |_ annotation_masks_100.pickle 
-    |
-    |_ image_level_annotations.pickle
-
+|   |
+|   |_ images.pickle
+|   |
+|   |_ annotation_masks_100.pickle 
+|   |
+|   |_ image_level_annotations.pickle
+|
+|__ images
 ```
 
 
@@ -98,19 +105,19 @@ We provide the option to train `SegGini` for three types of annotations.
 Training `SegGini` for `Inexact` annotations:
 
 ```
-python bin\train_graph.py --base_path <PATH-TO-STORED-DATASET> --config <PATH-TO-TRAINING-CONFIGURATION-YAML-FILE> 
+python bin/train_graph.py --base_path <PATH-TO-STORED-DATASET> --config <PATH-TO-TRAINING-CONFIGURATION-YAML-FILE> 
 ```
 
 Training `SegGini` for `Incomplete` annotations:
 
 ```
-python bin\train_node.py --base_path <PATH-TO-STORED-DATASET> --config <PATH-TO-TRAINING-CONFIGURATION-YAML-FILE> 
+python bin/train_node.py --base_path <PATH-TO-STORED-DATASET> --config <PATH-TO-TRAINING-CONFIGURATION-YAML-FILE> 
 ```
 
 Training `SegGini` for `Inexact + Incomplete` annotations:
 
 ```
-python bin\train_combined.py --base_path <PATH-TO-STORED-DATASET> --config <PATH-TO-TRAINING-CONFIGURATION-YAML-FILE> 
+python bin/train_combined.py --base_path <PATH-TO-STORED-DATASET> --config <PATH-TO-TRAINING-CONFIGURATION-YAML-FILE> 
 ```
 
 Sample configuration yaml files for all the above cases are provided in `./config`
